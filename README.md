@@ -1,8 +1,12 @@
-# FarmerPal
+<div style="display: flex; align-items: center; justify-content: center;">
+<img src="public/logo.png" alt="FarmerPal Logo" width="100" style="padding-right: 20px">
+  <h1>FarmerPal</h1>
+  
+</div>
 
 ## Overview
 
-**FarmerPal** is an AI-powered crop health management system designed to help farmers detect diseases, pests, and other threats to their crops early. By leveraging AI, satellite mapping, and community-driven insights, **FarmerPal** provides farmers with real-time, actionable data to optimize their yield and reduce losses.
+**FarmerPal** is an AI-powered crop health management system designed to help farmers in developing countries detect diseases, pests, and other threats to their crops early. By leveraging AI, satellite mapping, and community-driven insights, **FarmerPal** provides farmers with real-time, actionable data to optimize their yield and reduce losses.
 
 ## Features
 
@@ -127,7 +131,20 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server:
+Clone the Repository
+
+```sh
+git clone https://github.com/martinivnv/farmer-pal.git
+cd farmer-pal
+```
+
+Install dependencies
+
+```sh
+npm i
+```
+
+Then, run the development server:
 
 ```bash
 npm run dev

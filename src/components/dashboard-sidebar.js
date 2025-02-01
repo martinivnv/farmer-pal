@@ -7,6 +7,7 @@ import {
   Settings,
   AlertTriangle,
 } from "lucide-react";
+import { useState } from "react";
 import {
   Sidebar,
   SidebarContent,

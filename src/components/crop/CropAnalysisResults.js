@@ -1,7 +1,7 @@
-// components/crop/CropAnalysisResults.js
 "use client";
+// components/crop/CropAnalysisResults.js
 
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 export default function CropAnalysisResults({ results, isLoading }) {
   if (isLoading) {
@@ -18,48 +18,90 @@ export default function CropAnalysisResults({ results, isLoading }) {
     );
   }
 
-  if (!results) return null;
+  if (!results?.recommendations?.analysis) return null;
 
-  const { environmentalData, recommendations } = results;
+  const { analysis } = results.recommendations;
 
   return (
     <Card>
       <CardHeader>
-        <h2 className="text-2xl font-semibold">Analysis Results</h2>
+        <CardTitle>Analysis Results</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div>
-          <h3 className="text-lg font-medium mb-2">Environmental Conditions</h3>
-          <dl className="grid grid-cols-2 gap-4">
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Elevation</dt>
-              <dd>{environmentalData.elevation.toFixed(1)}m</dd>
+        <div className="space-y-4">
+          {/* Suitability Score */}
+          <div>
+            <h3 className="text-lg font-medium mb-2">Suitability Score</h3>
+            <div className="text-3xl font-bold text-blue-600">
+              {analysis.suitabilityScore}/10
             </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Soil pH</dt>
-              <dd>{environmentalData.soilQuality.ph}</dd>
-            </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-500">
-                Average Rainfall
-              </dt>
-              <dd>{environmentalData.climate.averageRainfall}mm/year</dd>
-            </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-500">
-                Growing Season
-              </dt>
-              <dd>{environmentalData.climate.growingSeasonLength} days</dd>
-            </div>
-          </dl>
-        </div>
+          </div>
 
-        <div>
-          <h3 className="text-lg font-medium mb-2">AI Recommendations</h3>
-          <div className="prose prose-sm max-w-none">
-            {recommendations.rawAnalysis.split("\n").map((line, i) => (
-              <p key={i}>{line}</p>
-            ))}
+          {/* Recommendations */}
+          <div>
+            <h3 className="text-lg font-medium mb-2">Key Recommendations</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {Object.entries(analysis.recommendations).map(([key, items]) => (
+                <div key={key} className="space-y-2">
+                  <h4 className="font-medium capitalize">
+                    {key.replace(/([A-Z])/g, " $1").trim()}
+                  </h4>
+                  <ul className="list-disc pl-4 space-y-1">
+                    {items.map((item, index) => (
+                      <li key={index} className="text-sm">
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Challenges */}
+          <div>
+            <h3 className="text-lg font-medium mb-2">Challenges & Solutions</h3>
+            <div className="space-y-3">
+              {analysis.challenges.map((item, index) => (
+                <div key={index} className="bg-gray-50 p-3 rounded-lg">
+                  <p className="font-medium text-red-600">{item.challenge}</p>
+                  <p className="text-sm mt-1">{item.mitigationStrategy}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Planting Windows */}
+          <div>
+            <h3 className="text-lg font-medium mb-2">Planting Windows</h3>
+            <div className="space-y-2">
+              {analysis.plantingWindows.map((window, index) => (
+                <div key={index} className="bg-green-50 p-3 rounded-lg">
+                  <p className="font-medium text-green-700">{window.season}</p>
+                  <p className="text-sm">
+                    {window.startMonth} - {window.endMonth}
+                  </p>
+                  {window.notes && (
+                    <p className="text-sm mt-1 text-gray-600">{window.notes}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Yield Potential */}
+          <div>
+            <h3 className="text-lg font-medium mb-2">Yield Potential</h3>
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <p className="text-xl font-bold text-blue-700">
+                {analysis.yieldPotential.minYield} -{" "}
+                {analysis.yieldPotential.maxYield}{" "}
+                {analysis.yieldPotential.unit}
+              </p>
+              {analysis.yieldPotential.notes && (
+                <p className="text-sm mt-2">{analysis.yieldPotential.notes}</p>
+              )}
+            </div>
           </div>
         </div>
       </CardContent>

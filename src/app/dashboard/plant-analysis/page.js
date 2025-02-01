@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Upload } from "@/components/plant-detect/upload";
+import HistoricPlants from "@/components/plant-detect/HistoricPlants";
 
 export default function UploadPage() {
   return (
@@ -28,6 +29,9 @@ export default function UploadPage() {
             </div>
           </CardContent>
         </Card>
+      </div>
+      <div>
+        <HistoricPlants />
       </div>
     </div>
   );

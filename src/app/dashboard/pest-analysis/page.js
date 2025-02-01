@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { PestUpload } from "@/components/pest-detect/upload";
+import HistoricPests from "@/components/pest-detect/HistoricPests";
 
 export default function PestAnalysisPage() {
   return (
@@ -28,6 +29,9 @@ export default function PestAnalysisPage() {
           <PestUpload />
         </CardContent>
       </Card>
+      <div>
+        <HistoricPests />
+      </div>
     </div>
   );
 }

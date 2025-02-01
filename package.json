@@ -21,6 +21,7 @@
     "@radix-ui/react-tooltip": "^1.1.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "firebase": "^11.2.0",
     "formidable": "^3.5.2",
     "googlemaps": "^1.12.0",

@@ -11,37 +11,17 @@ export default async function handler(req, res) {
 
   try {
     // Get query parameters
-    const { type = "all", limit = 100, mostRecent = true } = req.query;
+    const { limit = 100, mostRecent = true } = req.query;
 
     // Determine which data to fetch based on query
     let data;
-    if (type === "disease") {
-      data = await getCropDiseaseAnalyses({
-        limit: Number(limit),
-        mostRecent: mostRecent === "true",
-      });
-    } else if (type === "location") {
-      data = await getCropLocationPlans({
-        limit: Number(limit),
-        mostRecent: mostRecent === "true",
-      });
-    } else if (type === "all") {
-      // Fetch both disease and location data
-      const [diseaseData, locationData] = await Promise.all([
-        getCropDiseaseAnalyses({
-          limit: Number(limit) / 2,
-          mostRecent: mostRecent === "true",
-        }),
-        getCropLocationPlans({
-          limit: Number(limit) / 2,
-          mostRecent: mostRecent === "true",
-        }),
-      ]);
 
-      data = [...diseaseData, ...locationData];
-    } else {
-      return res.status(400).json({ message: "Invalid type parameter" });
-    }
+    data = await getCropLocationPlans({
+      limit: Number(limit),
+      mostRecent: mostRecent === "true",
+    });
+
+    console.log("Crop data fetched:", data.length);
 
     return res.status(200).json(data);
   } catch (error) {

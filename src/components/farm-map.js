@@ -9,11 +9,10 @@ import {
 } from "@/components/ui/tooltip";
 
 export function FarmMap() {
-  // Mock data for farm plots and issues - adjusted coordinates for visibility
   const farmPlots = [
     {
       id: 1,
-      path: "M200,200 L400,200 L400,400 L200,400 Z",
+      path: "M150,200 L350,200 L350,400 L150,400 Z",
       name: "North Field",
       crop: "Corn",
     },
@@ -54,9 +53,9 @@ export function FarmMap() {
 
   return (
     <div className="relative h-full w-full bg-[#1a1a1a]">
-      {/* Updated iframe for satellite view of a farm-sized area in Ghana */}
+      {/* Updated iframe with exact coordinates: 7.182761, -1.293987 */}
       <iframe
-        src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d3971.738!2d-1.713479!3d7.526123!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1sen!2sgh!4v1635787415478!5m2!1sen!2sgh&z=20&t=k&disableDefaultUI=true"
+        src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d3971.738!2d-1.293987!3d7.182761!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1sen!2sgh!4v1635787415478!5m2!1sen!2sgh&z=20&t=k&disableDefaultUI=true"
         className="h-full w-full border-0"
         allowFullScreen=""
         loading="lazy"

@@ -159,3 +159,40 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+Here are the steps you can include in your **README** file, with sensitive keys blanked out for security:
+
+---
+
+## Environment Variables Setup
+
+To run this project locally, you need to set up environment variables. Create a `.env.local` file in the root directory and add the following variables:
+
+```env
+# Google Maps API Key
+GOOGLE_MAPS_API_KEY=YOUR_GOOGLE_MAPS_API_KEY
+
+# Gemini AI API Key
+GEMINI_API_KEY=YOUR_GEMINI_API_KEY
+
+# Public Google Maps API Key (for frontend use)
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=YOUR_PUBLIC_GOOGLE_MAPS_API_KEY
+
+# API Base URL (Update this based on your environment)
+NEXT_PUBLIC_API_URL=http://localhost:3000
+
+# Firebase Configuration
+NEXT_PUBLIC_FIREBASE_API_KEY=YOUR_FIREBASE_API_KEY
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=YOUR_FIREBASE_AUTH_DOMAIN
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=YOUR_FIREBASE_PROJECT_ID
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=YOUR_FIREBASE_STORAGE_BUCKET
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=YOUR_FIREBASE_MESSAGING_SENDER_ID
+NEXT_PUBLIC_FIREBASE_APP_ID=YOUR_FIREBASE_APP_ID
+```
+
+### Steps to Configure:
+
+1. **Create a `.env.local` file** in the root directory.
+2. **Copy and paste** the above environment variables.
+3. **Replace `YOUR_XXXX` values** with your actual credentials.
+4. **Restart the development server** after adding the variables.

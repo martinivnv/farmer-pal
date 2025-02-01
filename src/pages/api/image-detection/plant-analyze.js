@@ -3,6 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { formidable } from "formidable";
 import fs from "fs";
 import { z } from "zod";
+import { saveCropAnalysis, sanitizeData } from "@/lib/firebase-helpers";
 
 // Disable the default body parser
 export const config = {
@@ -189,6 +190,17 @@ Ensure all arrays have at least one item and provide practical, actionable advic
         ],
       };
     }
+
+    const firestoreData = {
+      type: "plant-analysis",
+      analysis: analysisData,
+      timestamp: new Date().toISOString(),
+    };
+
+    // Save the analysis data to Firestore
+    const sanitizedData = sanitizeData(firestoreData);
+    const docId = await saveCropAnalysis(sanitizedData);
+    console.log("Plant analysis saved with ID:", docId);
 
     // Clean up the temporary file
     fs.unlinkSync(imageFile.filepath);

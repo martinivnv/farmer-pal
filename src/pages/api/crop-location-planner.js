@@ -1,5 +1,4 @@
 // pages/api/crop-location-planner.js
-import axios from "axios";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { readFileSync } from "fs";
 import path from "path";
@@ -11,10 +10,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Extract required parameters from request body
     const { lat, lng, radius, cropType } = req.body;
 
-    // Validate required parameters
     if (!lat || !lng || !radius || !cropType) {
       return res.status(400).json({
         error:
@@ -43,8 +40,7 @@ export default async function handler(req, res) {
       cropType
     );
 
-    // 4. Return combined results
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       location: {
         latitude: lat,
@@ -56,7 +52,7 @@ export default async function handler(req, res) {
     });
   } catch (error) {
     console.error("Error in crop location planning:", error);
-    res.status(500).json({
+    return res.status(500).json({
       error: "Failed to process crop location planning request",
       details: error.message,
     });
@@ -64,20 +60,36 @@ export default async function handler(req, res) {
 }
 
 async function fetchLocationData(lat, lng, apiKey) {
-  const endpoints = {
-    elevation: `https://maps.googleapis.com/maps/api/elevation/json?locations=${lat},${lng}&key=${apiKey}`,
-    placesNearby: `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=1000&key=${apiKey}`,
-  };
+  try {
+    const [elevationRes, placesRes] = await Promise.all([
+      fetch(
+        `https://maps.googleapis.com/maps/api/elevation/json?locations=${lat},${lng}&key=${apiKey}`
+      ),
+      fetch(
+        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=1000&key=${apiKey}`
+      ),
+    ]);
 
-  const [elevationRes, placesRes] = await Promise.all([
-    axios.get(endpoints.elevation),
-    axios.get(endpoints.placesNearby),
-  ]);
+    if (!elevationRes.ok || !placesRes.ok) {
+      throw new Error("Failed to fetch location data from Google APIs");
+    }
 
-  return {
-    elevation: elevationRes.data.results[0].elevation,
-    nearbyPlaces: placesRes.data.results,
-  };
+    const [elevationData, placesData] = await Promise.all([
+      elevationRes.json(),
+      placesRes.json(),
+    ]);
+
+    if (elevationData.status !== "OK" || placesData.status !== "OK") {
+      throw new Error("Invalid response from Google APIs");
+    }
+
+    return {
+      elevation: elevationData.results[0].elevation,
+      nearbyPlaces: placesData.results,
+    };
+  } catch (error) {
+    throw new Error(`Error fetching location data: ${error.message}`);
+  }
 }
 
 async function getEnvironmentalData(locationData) {
@@ -108,9 +120,10 @@ async function getEnvironmentalData(locationData) {
 }
 
 async function generateCropRecommendations(genAI, environmentalData, cropType) {
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-  const prompt = `Analyze the following environmental conditions for growing ${cropType}:
+    const prompt = `Analyze the following environmental conditions for growing ${cropType}:
   
 Environmental Data:
 - Elevation: ${environmentalData.elevation}m
@@ -129,11 +142,14 @@ Please provide:
 4. Best planting times
 5. Expected yield potential`;
 
-  const result = await model.generateContent(prompt);
-  const response = result.response.text();
+    const result = await model.generateContent(prompt);
+    const response = result.response.text();
 
-  return {
-    rawAnalysis: response,
-    timestamp: new Date().toISOString(),
-  };
+    return {
+      rawAnalysis: response,
+      timestamp: new Date().toISOString(),
+    };
+  } catch (error) {
+    throw new Error(`Error generating crop recommendations: ${error.message}`);
+  }
 }

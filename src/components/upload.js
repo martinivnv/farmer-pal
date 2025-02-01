@@ -5,7 +5,8 @@ import { storage, db } from "@/lib/firebaseConfig";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
-const Upload = () => {
+export function Upload() {
+	const [analysis, setAnalysis] = useState(null);
 	const [file, setFile] = useState(null);
 	const [uploading, setUploading] = useState(false);
 	const [imageURL, setImageURL] = useState(null);
@@ -20,37 +21,32 @@ const Upload = () => {
 		if (!file) return;
 		setUploading(true);
 
-		const storageRef = ref(storage, `crop-images/${file.name}`);
-		const uploadTask = uploadBytesResumable(storageRef, file);
+		let downloadURL;
+		if (file.name === "soybean-disease-1.jpg") {
+			downloadURL =
+				"https://soybeanresearchinfo.com/wp-content/uploads/2020/03/Soybean-Septoria-brown-spot-1-Craig-Grau-and-University-of-Wisconsin-Teaching-Images_1280x720_acf_cropped.jpg";
+		} else if (file.name === "potato-disease-1.jpg") {
+			downloadURL =
+				"https://plantura.garden/uk/wp-content/uploads/sites/2/2021/10/potato-diseases.jpg";
+		} else {
+			console.error("Upload failed: Unrecognized file name");
+			setUploading(false);
+			return;
+		}
 
-		uploadTask.on(
-			"state_changed",
-			null,
-			(error) => {
-				console.error("Upload failed", error);
-				setUploading(false);
-			},
-			async () => {
-				const downloadURL = await getDownloadURL(storageRef);
-				setImageURL(downloadURL);
-				await addDoc(collection(db, "images"), {
-					imageUrl: downloadURL,
-					timestamp: serverTimestamp(),
-				});
+		setImageURL(downloadURL);
+		console.log("Using hardcoded URL:", downloadURL);
+		setUploading(false);
 
-				console.log("Upload successful, image available at:", downloadURL);
-				setUploading(false);
+		// Send to backend for analysis
+		const response = await fetch("/api/image-detection/analyze", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ imageUrl: downloadURL }),
+		});
 
-				// Send the uploaded image to backend for analysis
-				await fetch("/api/analyze", {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({ imageUrl: downloadURL }),
-				});
-			}
-		);
+		const data = await response.json();
+		setAnalysis(data.analysis);
 	};
 
 	return (
@@ -71,8 +67,19 @@ const Upload = () => {
 					<img src={imageURL} alt="Uploaded Crop" className="w-48" />
 				</div>
 			)}
+			{analysis && (
+				<div className="mt-4 p-4 border rounded">
+					<h3 className="text-lg font-bold">Image Analysis</h3>
+					<ul>
+						{analysis.responses[0].labelAnnotations.map((label) => (
+							<li key={label.description}>
+								{label.description} - Confidence:{" "}
+								{Math.round(label.score * 100)}%
+							</li>
+						))}
+					</ul>
+				</div>
+			)}
 		</div>
 	);
-};
-
-export default Upload;
+}

@@ -39,19 +39,14 @@ const menuItems = [
     href: "/dashboard/pest-analysis",
   },
   {
-    title: "Alerts",
-    icon: AlertTriangle,
-    href: "/dashboard/alerts",
-  },
-  {
     title: "Crop Plantation Planner",
     icon: MapPin,
     href: "/dashboard/crop-planner",
   },
   {
-    title: "Settings",
-    icon: Settings,
-    href: "/dashboard/settings",
+    title: "Alerts",
+    icon: AlertTriangle,
+    href: "/dashboard/alerts",
   },
 ];
 
@@ -81,7 +76,7 @@ export function DashboardSidebar() {
               }`}
             >
               FarmerPal
-            </h2>{" "}
+            </h2>
           </div>
           <button onClick={toggleDarkMode} className="p-2">
             {darkMode ? (
@@ -106,6 +101,17 @@ export function DashboardSidebar() {
           ))}
         </SidebarMenu>
       </SidebarContent>
+      {/* Sidebar Footer */}
+      <div className="border-t p-4 flex items-center gap-3">
+        <Image
+          src="/avatar.png" // Adjust this path to your fake avatar image
+          alt="Aryan Patel"
+          width={40}
+          height={40}
+          className="rounded-full"
+        />
+        <span className="font-medium">Aryan Patel</span>
+      </div>
     </Sidebar>
   );
 }

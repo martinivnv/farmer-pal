@@ -1,36 +1,27 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { PestUpload } from "@/components/pest-detect/upload";
 import HistoricPests from "@/components/pest-detect/HistoricPests";
 
 export default function PestAnalysisPage() {
   return (
-    <div className="h-full space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">
-          Pest Detection & Analysis
-        </h2>
-      </div>
-      <Card className="w-full">
-        <CardHeader>
-          <CardDescription className="text-lg">
+    <div>
+      <div className="w-full space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-3xl font-bold tracking-tight">
+            Pest Detection & Analysis
+          </h2>
+        </div>
+        <div className="w-full p-4 border rounded">
+          <p className="text-lg mb-4">
             Upload an image to identify pests and get detailed mitigation
             strategies and control measures
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+          </p>
           <PestUpload />
-        </CardContent>
-      </Card>
-      <div>
-        <HistoricPests />
+        </div>
+        <div>
+          <HistoricPests />
+        </div>
       </div>
     </div>
   );

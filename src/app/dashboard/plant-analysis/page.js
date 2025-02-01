@@ -1,36 +1,27 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Upload } from "@/components/plant-detect/upload";
 import HistoricPlants from "@/components/plant-detect/HistoricPlants";
 
 export default function UploadPage() {
   return (
-    <div className="min-h-screen bg-gray-50 py-10">
-      <div className="container mx-auto px-4">
-        <Card className="max-w-4xl mx-auto">
-          <CardHeader className="text-center">
-            <CardTitle className="text-3xl">Plant Disease Analysis</CardTitle>
-            <CardDescription className="text-lg">
-              Upload an image of your crop for AI-powered disease detection and
-              health analysis
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="mt-6">
-              {/* Remove the Card wrapper from Upload component */}
-              <Upload />
-            </div>
-          </CardContent>
-        </Card>
+    <div className="min-h-screen bg-gray-50 py-10 w-full">
+      {/* Full-width header and upload area */}
+      <div className="w-full px-4">
+        <div className="text-center mb-6">
+          <h2 className="text-3xl font-bold">Plant Disease Analysis</h2>
+          <p className="text-lg">
+            Upload an image of your crop for AI-powered disease detection and
+            health analysis
+          </p>
+        </div>
+        <div className="w-full">
+          <Upload />
+        </div>
       </div>
-      <div>
+
+      {/* Full-width Historic Plants section */}
+      <div className="w-full mt-10 px-4">
         <HistoricPlants />
       </div>
     </div>

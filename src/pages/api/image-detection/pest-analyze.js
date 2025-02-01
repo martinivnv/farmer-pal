@@ -1,17 +1,18 @@
-// pages/api/pest-analysis.js
+// pages/api/image-detection/pest-analyze.js
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { formidable } from "formidable";
 import fs from "fs";
 import { z } from "zod";
 
+// Disable the default body parser
 export const config = {
   api: {
     bodyParser: false,
   },
 };
 
-// Schema for pest analysis response
-const PestAnalysisSchema = z
+// Schema for pest analysis validation
+const AnalysisResponseSchema = z
   .object({
     pestInfo: z.object({
       name: z.string(),
@@ -33,10 +34,12 @@ const PestAnalysisSchema = z
   })
   .strict();
 
+// Helper function to parse form data
 const parseForm = async (req) => {
   const options = {
     keepExtensions: true,
     maxFileSize: 10 * 1024 * 1024, // 10MB
+    allowEmptyFiles: false,
   };
 
   const form = formidable(options);
@@ -55,23 +58,37 @@ export default async function handler(req, res) {
   }
 
   try {
-    console.log("Receiving pest analysis request...");
+    console.log("Receiving upload request...");
     const { files } = await parseForm(req);
+    console.log("Files received:", files);
 
     const imageFile = files.image?.[0];
     if (!imageFile) {
       return res.status(400).json({ error: "No image file provided" });
     }
 
-    // Read and convert image
+    console.log("Processing image:", imageFile.originalFilename);
+
+    // Read the image file
     const imageBuffer = fs.readFileSync(imageFile.filepath);
     const imageBase64 = imageBuffer.toString("base64");
 
-    // Initialize Gemini
+    // Initialize Gemini API
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY is not configured");
+    }
+
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `You are an expert agricultural entomologist and pest control specialist. Analyze this image and provide a detailed assessment of any pests or pest damage visible.
+
+Focus on:
+1. Accurate pest identification
+2. Threat level assessment
+3. Potential crop damage evaluation
+4. Control methods and mitigation strategies
+5. Prevention recommendations
 
 Provide your analysis in the following JSON format:
 {
@@ -87,33 +104,24 @@ Provide your analysis in the following JSON format:
   "controlMeasures": [
     {
       "type": "Method name (e.g., Chemical, Biological, Cultural)",
-      "steps": ["Detailed step 1", "Detailed step 2", ...]
+      "steps": ["Detailed step 1", "Detailed step 2"]
     }
   ],
   "preventionTips": [
     "Prevention tip 1",
-    "Prevention tip 2",
-    ...
+    "Prevention tip 2"
   ],
   "additionalResources": [
     "Relevant information or resource 1",
-    "Relevant information or resource 2",
-    ...
+    "Relevant information or resource 2"
   ]
 }
 
-Include specific and actionable information about:
-1. Accurate pest identification
-2. Potential crop damage
-3. Life cycle information
-4. Control methods
-5. Prevention strategies
-6. Environmental considerations
-7. Safety precautions
+Ensure all arrays have at least one item and provide practical, actionable advice.`;
 
-Ensure all recommendations are practical and environmentally conscious.`;
+    console.log("Sending to Gemini API...");
 
-    // Process with Gemini
+    // Process image with Gemini
     const result = await model.generateContent([
       prompt,
       {
@@ -127,12 +135,14 @@ Ensure all recommendations are practical and environmentally conscious.`;
     const response = await result.response;
     const text = response.text();
 
-    // Parse and validate
+    console.log("Received response from Gemini");
+
+    // Parse and validate the response
     let analysisData;
     try {
       const cleanedText = text.replace(/```json\n?|\n?```/g, "").trim();
       const parsedData = JSON.parse(cleanedText);
-      analysisData = PestAnalysisSchema.parse(parsedData);
+      analysisData = AnalysisResponseSchema.parse(parsedData);
     } catch (error) {
       console.error("Parsing error:", error);
       analysisData = {
@@ -167,10 +177,10 @@ Ensure all recommendations are practical and environmentally conscious.`;
       };
     }
 
-    // Cleanup
+    // Clean up the temporary file
     fs.unlinkSync(imageFile.filepath);
 
-    // Return results
+    // Return the analysis results
     return res.status(200).json({
       success: true,
       analysis: analysisData,

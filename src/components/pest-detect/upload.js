@@ -32,7 +32,7 @@ export function PestUpload() {
       const formData = new FormData();
       formData.append("image", file);
 
-      const response = await fetch("/api/image-detection/pest-analysis", {
+      const response = await fetch("/api/image-detection/pest-analyze", {
         method: "POST",
         body: formData,
       });

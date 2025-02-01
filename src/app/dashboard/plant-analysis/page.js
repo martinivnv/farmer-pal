@@ -1,5 +1,3 @@
-"use client";
-
 import { Upload } from "@/components/plant-detect/upload";
 import HistoricPlants from "@/components/plant-detect/HistoricPlants";
 

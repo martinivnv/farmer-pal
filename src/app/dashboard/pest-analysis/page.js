@@ -1,5 +1,3 @@
-"use client";
-
 import { PestUpload } from "@/components/pest-detect/upload";
 import HistoricPests from "@/components/pest-detect/HistoricPests";
 

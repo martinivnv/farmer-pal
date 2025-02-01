@@ -1,8 +1,8 @@
 // pages/api/crop-location-planner.js
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { readFileSync } from "fs";
-import path from "path";
+
 import { generateCropRecommendations } from "@/utils/api";
+import { saveCropLocationPlan, sanitizeData } from "@/lib/firebase-helpers";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -21,10 +21,6 @@ export default async function handler(req, res) {
           "Missing required parameters: lat, lng, radius, and cropType are required.",
       });
     }
-
-    // Read credentials from the JSON file
-    const credentialsPath = path.join(process.cwd(), "farmer-pal.json");
-    const credentials = JSON.parse(readFileSync(credentialsPath, "utf8"));
 
     // Initialize Google API client with credentials
     const googleApiKey = process.env.GOOGLE_MAPS_API_KEY;
@@ -47,15 +43,38 @@ export default async function handler(req, res) {
       cropType
     );
 
-    return res.status(200).json({
-      success: true,
+    // 4. Prepare data for saving
+    const analysisData = {
       location: {
         latitude: lat,
         longitude: lng,
         searchRadius: radius,
       },
+      cropType,
       environmentalData,
       recommendations: cropRecommendations,
+      metadata: {
+        locationDetails: {
+          elevation: locationData.elevation,
+          nearbyPlaces: locationData.nearbyPlaces.map((place) => ({
+            name: place.name,
+            type: place.types?.[0] || "unknown",
+            distance: place.vicinity,
+          })),
+        },
+      },
+    };
+
+    // 5. Save to Firebase
+    const sanitizedData = sanitizeData(analysisData);
+    const docId = await saveCropLocationPlan(sanitizedData);
+
+    console.log("Saved to Firebase with document ID:", docId);
+
+    return res.status(200).json({
+      success: true,
+      documentId: docId,
+      ...analysisData,
     });
   } catch (error) {
     console.error("Error in crop location planning:", error);
@@ -68,37 +87,59 @@ export default async function handler(req, res) {
 
 async function fetchLocationData(lat, lng, apiKey) {
   try {
+    console.log("Fetching location data for:", { lat, lng });
+
     const [elevationRes, placesRes] = await Promise.all([
       fetch(
-        `https://maps.googleapis.com/maps/api/elevation/json?locations=${lat},${lng}&key=${apiKey}`
+        `https://maps.googleapis.com/maps/api/elevation/json?locations=${lat},${lng}&key=${apiKey}`,
+        {
+          headers: {
+            Accept: "application/json",
+            "User-Agent": "Node.js",
+          },
+        }
       ),
       fetch(
-        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=1000&key=${apiKey}`
+        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=1000&key=${apiKey}`,
+        {
+          headers: {
+            Accept: "application/json",
+            "User-Agent": "Node.js",
+          },
+        }
       ),
     ]);
-
-    if (!elevationRes.ok || !placesRes.ok) {
-      throw new Error("Failed to fetch location data from Google APIs");
-    }
 
     const [elevationData, placesData] = await Promise.all([
       elevationRes.json(),
       placesRes.json(),
     ]);
 
-    console.log("Elevation data:", elevationData);
-    console.log("Nearby places data:", placesData);
+    console.log("API Responses received:", {
+      elevationStatus: elevationData.status,
+      placesStatus: placesData.status,
+    });
 
-    if (elevationData.status !== "OK" && placesData.status !== "OK") {
-      throw new Error("Invalid response from Google APIs");
+    // Handle potential API errors more gracefully
+    if (elevationData.status !== "OK") {
+      console.warn("Elevation API warning:", elevationData);
+      return {
+        elevation: 0,
+        nearbyPlaces: [],
+      };
     }
 
     return {
-      elevation: elevationData.results[0].elevation,
-      nearbyPlaces: placesData.results,
+      elevation: elevationData.results[0]?.elevation || 0,
+      nearbyPlaces: placesData.results || [],
     };
   } catch (error) {
-    throw new Error(`Error fetching location data: ${error.message}`);
+    console.error("Location data fetch error:", error);
+    // Return default data instead of throwing
+    return {
+      elevation: 0,
+      nearbyPlaces: [],
+    };
   }
 }
 

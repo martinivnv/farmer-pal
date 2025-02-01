@@ -1,137 +1,91 @@
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
-import { Overview } from "@/components/overview";
-import { RecentDiagnoses } from "@/components/recent-diagnoses";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { AlertTriangle, Bug, Leaf, Upload } from "lucide-react";
+import { FarmMap } from "@/components/farm-map";
+import { AlertsList } from "@/components/alerts-list";
 
 export default function DashboardPage() {
 	return (
-		<div className="flex-1 space-y-4 p-8 pt-6">
-			<div className="flex items-center justify-between space-y-2">
-				<h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+		<div className="flex h-screen">
+			<div className="flex-1 p-4">
+				<div className="grid gap-4">
+					{/* Quick Actions */}
+					<div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+						<Card className="bg-primary/10">
+							<CardHeader className="flex flex-row items-center justify-between pb-2">
+								<CardTitle className="text-sm font-medium">
+									Quick Upload
+								</CardTitle>
+								<Upload className="h-4 w-4 text-primary" />
+							</CardHeader>
+							<CardContent>
+								<Button className="w-full" variant="outline">
+									Analyze Image
+								</Button>
+							</CardContent>
+						</Card>
+						<Card className="bg-destructive/10">
+							<CardHeader className="flex flex-row items-center justify-between pb-2">
+								<CardTitle className="text-sm font-medium">
+									Active Alerts
+								</CardTitle>
+								<AlertTriangle className="h-4 w-4 text-destructive" />
+							</CardHeader>
+							<CardContent>
+								<div className="text-2xl font-bold">5</div>
+								<p className="text-xs text-muted-foreground">3 high priority</p>
+							</CardContent>
+						</Card>
+						<Card className="bg-green-500/10">
+							<CardHeader className="flex flex-row items-center justify-between pb-2">
+								<CardTitle className="text-sm font-medium">
+									Crop Health
+								</CardTitle>
+								<Leaf className="h-4 w-4 text-green-500" />
+							</CardHeader>
+							<CardContent>
+								<div className="text-2xl font-bold">Good</div>
+								<p className="text-xs text-muted-foreground">
+									92% healthy crops
+								</p>
+							</CardContent>
+						</Card>
+						<Card className="bg-yellow-500/10">
+							<CardHeader className="flex flex-row items-center justify-between pb-2">
+								<CardTitle className="text-sm font-medium">
+									Pest Activity
+								</CardTitle>
+								<Bug className="h-4 w-4 text-yellow-500" />
+							</CardHeader>
+							<CardContent>
+								<div className="text-2xl font-bold">Low</div>
+								<p className="text-xs text-muted-foreground">
+									2 areas affected
+								</p>
+							</CardContent>
+						</Card>
+					</div>
+
+					{/* Map */}
+					<Card className="col-span-3 h-[600px]">
+						<CardHeader>
+							<CardTitle>Farm Overview</CardTitle>
+						</CardHeader>
+						<CardContent className="p-0">
+							<FarmMap />
+						</CardContent>
+					</Card>
+				</div>
 			</div>
-			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-				<Card>
-					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-						<CardTitle className="text-sm font-medium">
-							Total Diagnoses
-						</CardTitle>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth="2"
-							className="h-4 w-4 text-muted-foreground"
-						>
-							<path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-						</svg>
-					</CardHeader>
-					<CardContent>
-						<div className="text-2xl font-bold">1,234</div>
-						<p className="text-xs text-muted-foreground">
-							+20.1% from last month
-						</p>
-					</CardContent>
-				</Card>
-				<Card>
-					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-						<CardTitle className="text-sm font-medium">Active Users</CardTitle>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth="2"
-							className="h-4 w-4 text-muted-foreground"
-						>
-							<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-							<circle cx="9" cy="7" r="4" />
-							<path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-						</svg>
-					</CardHeader>
-					<CardContent>
-						<div className="text-2xl font-bold">573</div>
-						<p className="text-xs text-muted-foreground">
-							+180.1% from last month
-						</p>
-					</CardContent>
-				</Card>
-				<Card>
-					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-						<CardTitle className="text-sm font-medium">Alerts</CardTitle>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth="2"
-							className="h-4 w-4 text-muted-foreground"
-						>
-							<path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-						</svg>
-					</CardHeader>
-					<CardContent>
-						<div className="text-2xl font-bold">12</div>
-						<p className="text-xs text-muted-foreground">+19% from last week</p>
-					</CardContent>
-				</Card>
-				<Card>
-					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-						<CardTitle className="text-sm font-medium">
-							Community Posts
-						</CardTitle>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth="2"
-							className="h-4 w-4 text-muted-foreground"
-						>
-							<path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-						</svg>
-					</CardHeader>
-					<CardContent>
-						<div className="text-2xl font-bold">573</div>
-						<p className="text-xs text-muted-foreground">
-							+201 since last week
-						</p>
-					</CardContent>
-				</Card>
-			</div>
-			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-				<Card className="col-span-4">
-					<CardHeader>
-						<CardTitle>Overview</CardTitle>
-					</CardHeader>
-					<CardContent className="pl-2">
-						<Overview />
-					</CardContent>
-				</Card>
-				<Card className="col-span-3">
-					<CardHeader>
-						<CardTitle>Recent Diagnoses</CardTitle>
-						<CardDescription>
-							You have made 265 diagnoses this month.
-						</CardDescription>
-					</CardHeader>
-					<CardContent>
-						<RecentDiagnoses />
-					</CardContent>
-				</Card>
+
+			{/* Right Panel - Alerts */}
+			<div className="w-96 border-l bg-muted/50 p-4">
+				<div className="flex items-center justify-between">
+					<h2 className="text-lg font-semibold">Recent Alerts</h2>
+					<Badge variant="outline">5 New</Badge>
+				</div>
+				<AlertsList />
 			</div>
 		</div>
 	);

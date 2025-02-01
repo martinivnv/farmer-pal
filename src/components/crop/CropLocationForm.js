@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 
 const CROP_TYPES = [
+  "Cocoa Plant",
   "Corn",
   "Wheat",
   "Soybeans",

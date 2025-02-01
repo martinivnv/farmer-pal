@@ -13,6 +13,8 @@ export default async function handler(req, res) {
   try {
     const { lat, lng, radius, cropType } = req.body;
 
+    console.log("Received crop location planning request:", req.body);
+
     if (!lat || !lng || !radius || !cropType) {
       return res.status(400).json({
         error:
@@ -27,6 +29,10 @@ export default async function handler(req, res) {
     // Initialize Google API client with credentials
     const googleApiKey = process.env.GOOGLE_MAPS_API_KEY;
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+    if (!googleApiKey) {
+      throw new Error("GOOGLE_MAPS_API_KEY is not configured");
+    }
 
     // 1. Fetch location data from Google Maps API
     const locationData = await fetchLocationData(lat, lng, googleApiKey);
@@ -80,7 +86,10 @@ async function fetchLocationData(lat, lng, apiKey) {
       placesRes.json(),
     ]);
 
-    if (elevationData.status !== "OK" || placesData.status !== "OK") {
+    console.log("Elevation data:", elevationData);
+    console.log("Nearby places data:", placesData);
+
+    if (elevationData.status !== "OK" && placesData.status !== "OK") {
       throw new Error("Invalid response from Google APIs");
     }
 

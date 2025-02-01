@@ -1,17 +1,9 @@
 "use client";
 // components/crop/CropDashboardClient.js
 import { useState } from "react";
-import dynamic from "next/dynamic";
 import CropLocationForm from "./CropLocationForm";
 import CropAnalysisResults from "./CropAnalysisResults";
-
-// Dynamically import the map component to avoid SSR issues
-const CropLocationMap = dynamic(() => import("./CropLocationMap"), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-96 bg-gray-100 animate-pulse rounded-lg" />
-  ),
-});
+import CropLocationMap from "./CropLocationMap";
 
 export default function CropDashboardClient() {
   const [analysisResults, setAnalysisResults] = useState(null);
@@ -28,25 +20,33 @@ export default function CropDashboardClient() {
     setError(null);
 
     try {
+      // Create the request payload
+      const payload = {
+        ...formData,
+        lat: selectedLocation.lat,
+        lng: selectedLocation.lng,
+        radius: formData.radius || 1000, // default radius if not provided
+        cropType: formData.cropType,
+      };
+
       const response = await fetch("/api/crop-location-planner", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          ...formData,
-          ...selectedLocation,
-        }),
+        body: JSON.stringify(payload),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error("Failed to analyze location");
+        throw new Error(data.error || "Failed to analyze location");
       }
 
-      const data = await response.json();
       setAnalysisResults(data);
     } catch (err) {
-      setError(err.message);
+      console.error("Analysis error:", err);
+      setError(err.message || "Failed to process the request");
     } finally {
       setIsLoading(false);
     }

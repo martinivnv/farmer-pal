@@ -52,7 +52,7 @@ const menuItems = [
   {
     title: "Crop Plantation Planner",
     icon: MapPin,
-    href: "/dashboard/crop",
+    href: "/dashboard/crop-planner",
   },
   {
     title: "Settings",

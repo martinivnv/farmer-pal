@@ -26,7 +26,7 @@ export default function CropLocationMap({
         },
         () => {
           // Fallback to a default location if geolocation fails
-          initializeMap({ lat: 51.5074, lng: -0.1278 }); // Default to London
+          initializeMap({ lat: -13.977843, lng: 33.768872 }); // Default to Malawi -13.977843, 33.768872
         }
       );
     }

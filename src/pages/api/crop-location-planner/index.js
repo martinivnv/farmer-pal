@@ -147,20 +147,20 @@ async function getEnvironmentalData(locationData) {
   return {
     elevation: locationData.elevation,
     soilQuality: {
-      ph: 6.8,
-      organicMatter: "4.2%",
-      nitrogen: "High",
-      phosphorus: "Medium",
-      potassium: "High",
+      ph: 6.5,
+      organicMatter: "3.5%",
+      nitrogen: "Moderate",
+      phosphorus: "Low",
+      potassium: "Medium",
     },
     climate: {
-      averageRainfall: 800,
-      averageTemperature: 22,
-      growingSeasonLength: 240,
+      averageRainfall: 900, // in millimeters
+      averageTemperature: 24, // in °C
+      growingSeasonLength: 180, // in days
     },
     terrain: {
-      slope: "2%",
-      aspect: "South-facing",
+      slope: "1%",
+      aspect: "North-east", // approximate aspect
       drainageClass: "Well-drained",
     },
   };

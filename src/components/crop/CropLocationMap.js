@@ -16,19 +16,20 @@ export default function CropLocationMap({
   // Get user's location or use a default location
   useEffect(() => {
     if (!isMapLoaded) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const userLocation = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          };
-          initializeMap(userLocation);
-        },
-        () => {
-          // Fallback to a default location if geolocation fails
-          initializeMap({ lat: -13.977843, lng: 33.768872 }); // Default to Malawi -13.977843, 33.768872
-        }
-      );
+      // navigator.geolocation.getCurrentPosition(
+      //   (position) => {
+      //     const userLocation = {
+      //       lat: position.coords.latitude,
+      //       lng: position.coords.longitude,
+      //     };
+      //     initializeMap(userLocation);
+      //   },
+      //   () => {
+      //     // Fallback to a default location if geolocation fails
+      //     initializeMap({ lat: -13.977843, lng: 33.768872 }); // Default to Malawi -13.977843, 33.768872
+      //   }
+      // );
+      initializeMap({ lat: 7.729149, lng: -0.867623 }); //7.729149, -0.867623
     }
   }, [isMapLoaded]);
 

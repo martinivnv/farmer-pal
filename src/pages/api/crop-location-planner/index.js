@@ -147,20 +147,20 @@ async function getEnvironmentalData(locationData) {
   return {
     elevation: locationData.elevation,
     soilQuality: {
-      ph: 6.5,
-      organicMatter: "3.5%",
-      nitrogen: "Moderate",
-      phosphorus: "Low",
-      potassium: "Medium",
+      ph: 6.8,
+      organicMatter: "2.5%",
+      nitrogen: "Low",
+      phosphorus: "Medium",
+      potassium: "High",
     },
     climate: {
-      averageRainfall: 900, // in millimeters
-      averageTemperature: 24, // in °C
-      growingSeasonLength: 180, // in days
+      averageRainfall: 1000, // in millimeters
+      averageTemperature: 27, // in °C
+      growingSeasonLength: 200, // in days
     },
     terrain: {
-      slope: "1%",
-      aspect: "North-east", // approximate aspect
+      slope: "2%",
+      aspect: "South-west", // approximate aspect for many parts of Ghana
       drainageClass: "Well-drained",
     },
   };

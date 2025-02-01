@@ -2,6 +2,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { readFileSync } from "fs";
 import path from "path";
+import { generateCropRecommendations } from "@/utils/api";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -33,7 +34,7 @@ export default async function handler(req, res) {
     // 2. Get environmental data
     const environmentalData = await getEnvironmentalData(locationData);
 
-    // 3. Generate crop recommendations using Gemini
+    // 3. Generate crop recommendations using imported function
     const cropRecommendations = await generateCropRecommendations(
       genAI,
       environmentalData,
@@ -93,10 +94,6 @@ async function fetchLocationData(lat, lng, apiKey) {
 }
 
 async function getEnvironmentalData(locationData) {
-  // In a production environment, you would want to:
-  // 1. Integrate with real weather APIs
-  // 2. Use soil testing data APIs if available
-  // 3. Consider historical climate data
   return {
     elevation: locationData.elevation,
     soilQuality: {
@@ -107,9 +104,9 @@ async function getEnvironmentalData(locationData) {
       potassium: "High",
     },
     climate: {
-      averageRainfall: 800, // mm per year
-      averageTemperature: 22, // °C
-      growingSeasonLength: 240, // days
+      averageRainfall: 800,
+      averageTemperature: 22,
+      growingSeasonLength: 240,
     },
     terrain: {
       slope: "2%",
@@ -117,39 +114,4 @@ async function getEnvironmentalData(locationData) {
       drainageClass: "Well-drained",
     },
   };
-}
-
-async function generateCropRecommendations(genAI, environmentalData, cropType) {
-  try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-    const prompt = `Analyze the following environmental conditions for growing ${cropType}:
-  
-Environmental Data:
-- Elevation: ${environmentalData.elevation}m
-- Soil pH: ${environmentalData.soilQuality.ph}
-- Organic Matter: ${environmentalData.soilQuality.organicMatter}
-- Nutrients: N:${environmentalData.soilQuality.nitrogen}, P:${environmentalData.soilQuality.phosphorus}, K:${environmentalData.soilQuality.potassium}
-- Annual Rainfall: ${environmentalData.climate.averageRainfall}mm
-- Average Temperature: ${environmentalData.climate.averageTemperature}°C
-- Growing Season: ${environmentalData.climate.growingSeasonLength} days
-- Terrain: ${environmentalData.terrain.slope} slope, ${environmentalData.terrain.aspect}, ${environmentalData.terrain.drainageClass}
-
-Please provide:
-1. Suitability score (1-10)
-2. Specific recommendations for optimal growth
-3. Potential challenges and mitigation strategies
-4. Best planting times
-5. Expected yield potential`;
-
-    const result = await model.generateContent(prompt);
-    const response = result.response.text();
-
-    return {
-      rawAnalysis: response,
-      timestamp: new Date().toISOString(),
-    };
-  } catch (error) {
-    throw new Error(`Error generating crop recommendations: ${error.message}`);
-  }
 }

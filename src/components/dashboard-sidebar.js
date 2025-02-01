@@ -60,7 +60,7 @@ export function DashboardSidebar() {
 		<Sidebar>
 			<SidebarHeader className="border-b p-4">
 				<div className="flex items-center justify-between gap-4">
-					<div className="flex items-center gap-4">
+					<div className="flex items-center gap-3">
 						<Image
 							src="/logo.png"
 							alt="Logo"
@@ -69,7 +69,7 @@ export function DashboardSidebar() {
 							className="rounded-full border border-gray-300"
 						/>
 						<h2
-							className={`text-lg font-semibold ${
+							className={`text-lg font-bold ${
 								darkMode ? "text-[#e7e2c6]" : "text-[#2e402b]"
 							}`}
 						>

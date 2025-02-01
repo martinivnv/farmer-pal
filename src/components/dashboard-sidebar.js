@@ -38,16 +38,10 @@ const menuItems = [
     icon: Bug,
     href: "/dashboard/pest-analysis",
   },
-
   {
     title: "Alerts",
     icon: AlertTriangle,
     href: "/dashboard/alerts",
-  },
-  {
-    title: "Analytics",
-    icon: BarChart,
-    href: "/dashboard/analytics",
   },
   {
     title: "Crop Plantation Planner",

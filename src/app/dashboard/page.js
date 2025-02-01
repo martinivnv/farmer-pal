@@ -68,11 +68,11 @@ export default function DashboardPage() {
 					</div>
 
 					{/* Map */}
-					<Card className="col-span-3 h-[600px]">
+					<Card className="h-[600px] w-full">
 						<CardHeader>
 							<CardTitle>Farm Overview</CardTitle>
 						</CardHeader>
-						<CardContent className="p-0">
+						<CardContent className="p-0 h-full">
 							<FarmMap />
 						</CardContent>
 					</Card>

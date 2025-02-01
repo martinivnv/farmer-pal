@@ -1,85 +1,192 @@
 "use client";
 
 import { useState } from "react";
-import { storage, db } from "@/lib/firebaseConfig";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Upload as UploadIcon, AlertCircle, Loader2 } from "lucide-react";
+import Image from "next/image";
 
 export function Upload() {
-	const [analysis, setAnalysis] = useState(null);
-	const [file, setFile] = useState(null);
-	const [uploading, setUploading] = useState(false);
-	const [imageURL, setImageURL] = useState(null);
+  const [analysis, setAnalysis] = useState(null);
+  const [file, setFile] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
 
-	const handleFileChange = (event) => {
-		if (event.target.files && event.target.files[0]) {
-			setFile(event.target.files[0]);
-		}
-	};
+  const handleFileChange = (event) => {
+    const selectedFile = event.target.files?.[0];
+    if (selectedFile && selectedFile.type.startsWith("image/")) {
+      setFile(selectedFile);
+      setPreviewUrl(URL.createObjectURL(selectedFile));
+      setAnalysis(null);
+      setError(null);
+    }
+  };
 
-	const handleUpload = async () => {
-		if (!file) return;
-		setUploading(true);
+  // In your Upload component's handleUpload function
+  const handleUpload = async () => {
+    if (!file) return;
 
-		let downloadURL;
-		if (file.name === "soybean-disease-1.jpg") {
-			downloadURL =
-				"https://soybeanresearchinfo.com/wp-content/uploads/2020/03/Soybean-Septoria-brown-spot-1-Craig-Grau-and-University-of-Wisconsin-Teaching-Images_1280x720_acf_cropped.jpg";
-		} else if (file.name === "potato-disease-1.jpg") {
-			downloadURL =
-				"https://plantura.garden/uk/wp-content/uploads/sites/2/2021/10/potato-diseases.jpg";
-		} else {
-			console.error("Upload failed: Unrecognized file name");
-			setUploading(false);
-			return;
-		}
+    setIsLoading(true);
+    setError(null);
 
-		setImageURL(downloadURL);
-		console.log("Using hardcoded URL:", downloadURL);
-		setUploading(false);
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
 
-		// Send to backend for analysis
-		const response = await fetch("/api/image-detection/analyze", {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ imageUrl: downloadURL }),
-		});
+      const response = await fetch("/api/image-detection/analyze", {
+        // Make sure this matches your API endpoint path
+        method: "POST",
+        body: formData,
+      });
 
-		const data = await response.json();
-		setAnalysis(data.analysis);
-	};
+      const data = await response.json();
 
-	return (
-		<div className="p-4 border rounded-md shadow-md">
-			<h2 className="text-lg font-bold">Upload Crop Image</h2>
-			<input type="file" accept="image/*" onChange={handleFileChange} />
-			<button
-				onClick={handleUpload}
-				className="mt-2 px-4 py-2 bg-blue-600 text-white rounded"
-				disabled={uploading}
-			>
-				{uploading ? "Uploading..." : "Upload"}
-			</button>
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to analyze image");
+      }
 
-			{imageURL && (
-				<div className="mt-4">
-					<p>Uploaded Image:</p>
-					<img src={imageURL} alt="Uploaded Crop" className="w-48" />
-				</div>
-			)}
-			{analysis && (
-				<div className="mt-4 p-4 border rounded">
-					<h3 className="text-lg font-bold">Image Analysis</h3>
-					<ul>
-						{analysis.responses[0].labelAnnotations.map((label) => (
-							<li key={label.description}>
-								{label.description} - Confidence:{" "}
-								{Math.round(label.score * 100)}%
-							</li>
-						))}
-					</ul>
-				</div>
-			)}
-		</div>
-	);
+      setAnalysis(data.analysis);
+    } catch (err) {
+      console.error("Analysis error:", err);
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  return (
+    <Card className="w-full max-w-2xl mx-auto">
+      <CardHeader>
+        <h2 className="text-2xl font-bold">Plant Disease Analysis</h2>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Upload Area */}
+        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="hidden"
+            id="image-upload"
+          />
+          <label
+            htmlFor="image-upload"
+            className="flex flex-col items-center justify-center cursor-pointer"
+          >
+            {previewUrl ? (
+              <div className="relative w-full h-64">
+                <Image
+                  src={previewUrl}
+                  alt="Selected plant"
+                  fill
+                  className="object-contain rounded-lg"
+                />
+              </div>
+            ) : (
+              <div className="text-center">
+                <UploadIcon className="mx-auto h-12 w-12 text-gray-400" />
+                <p className="mt-2 text-sm text-gray-600">
+                  Click or drag to upload a plant image for analysis
+                </p>
+              </div>
+            )}
+          </label>
+        </div>
+
+        {/* Upload Button */}
+        <Button
+          onClick={handleUpload}
+          disabled={!file || isLoading}
+          className="w-full"
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Analyzing...
+            </>
+          ) : (
+            "Analyze Plant"
+          )}
+        </Button>
+
+        {/* Error Display */}
+        {error && (
+          <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-lg">
+            <AlertCircle className="h-5 w-5" />
+            <p>{error}</p>
+          </div>
+        )}
+
+        {/* Analysis Results */}
+        {analysis && (
+          <div className="space-y-4 mt-6">
+            {/* Health Status */}
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h3 className="font-semibold">Overall Health</h3>
+              <div className="mt-2">
+                <div className="flex items-center justify-between">
+                  <span>Status: {analysis.healthStatus.overall}</span>
+                  <span className="font-bold">
+                    Score: {analysis.healthStatus.score}/10
+                  </span>
+                </div>
+                <p className="mt-2 text-gray-600">
+                  {analysis.healthStatus.description}
+                </p>
+              </div>
+            </div>
+
+            {/* Diseases */}
+            {analysis.diseases.length > 0 && (
+              <div className="bg-red-50 p-4 rounded-lg">
+                <h3 className="font-semibold">Detected Issues</h3>
+                <div className="space-y-3 mt-2">
+                  {analysis.diseases.map((disease, index) => (
+                    <div key={index} className="border-l-4 border-red-400 pl-3">
+                      <p className="font-medium">{disease.name}</p>
+                      <p className="text-sm text-gray-600">
+                        Confidence: {disease.confidence}
+                      </p>
+                      <div className="mt-2">
+                        <p className="text-sm font-medium">Treatment:</p>
+                        <ul className="list-disc list-inside text-sm">
+                          {disease.treatment.map((step, i) => (
+                            <li key={i}>{step}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Growth Stage */}
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <h3 className="font-semibold">Growth Stage</h3>
+              <p className="mt-1">{analysis.growthStage.stage}</p>
+              <div className="mt-2">
+                <p className="text-sm font-medium">Recommendations:</p>
+                <ul className="list-disc list-inside text-sm">
+                  {analysis.growthStage.recommendations.map((rec, index) => (
+                    <li key={index}>{rec}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* Care Recommendations */}
+            <div className="bg-green-50 p-4 rounded-lg">
+              <h3 className="font-semibold">Care Recommendations</h3>
+              <ul className="list-disc list-inside mt-2 text-sm">
+                {analysis.careRecommendations.map((rec, index) => (
+                  <li key={index}>{rec}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
 }

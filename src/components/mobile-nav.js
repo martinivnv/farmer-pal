@@ -24,7 +24,7 @@ export function MobileNav() {
 				<SheetHeader>
 					<SheetTitle>Menu</SheetTitle>
 					<SheetDescription>
-						Navigate through the AgriHealth Dashboard
+						Navigate through the FarmerPal Dashboard
 					</SheetDescription>
 				</SheetHeader>
 				<div className="grid gap-4 py-4">

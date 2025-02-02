@@ -112,7 +112,7 @@
 - **Firebase & Firestore**: for authentication & real-time data storage
 - **Google Cloud Functions**: to trigger AI inference on uploads
 - **Google Gemini API**: Core AI engine used for processing images, diagnosing crop diseases, and identifying pests. Additionally, it provides tailored treatment recommendations based on AI analysis. This ensures real-time decision-making for farmers, helping them optimize their crop management strategies efficiently.
-- **ImageFX** Google AI image generator tool that creates photo-realistic and life-like images with simple steps, used to generate the logo for founder pal
+- **ImageFX** Google AI image generator tool that creates photo-realistic and life-like images with simple steps, used to generate the logo for FarmerPal
 
 ## Future Enhancements
 
